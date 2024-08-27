@@ -1,0 +1,32 @@
+trigger ClosedOpportunityTrigger on Opportunity (after insert, after update) {
+
+    // Create a list to hold tasks to be inserted
+    List<Task> tasksToInsert = new List<Task>();
+
+    // Iterate over the Opportunities in the trigger context
+    for (Opportunity opp : Trigger.new) {
+        // Check if the opportunity is being updated or inserted
+        // and if its stage is "Closed Won"
+        if (opp.StageName == 'Closed Won') {
+            // Only add tasks for opportunities that are not already in the list
+            if (Trigger.isInsert || 
+                (Trigger.isUpdate && Trigger.oldMap.get(opp.Id).StageName != 'Closed Won')) {
+                
+                // Create a new Task record
+                Task followUpTask = new Task(
+                    Subject = 'Follow Up Test Task',
+                    WhatId = opp.Id,
+                    Status = 'Not Started', // Set status as needed
+                    Priority = 'Normal' // Set priority as needed
+                );
+                
+                // Add the task to the list
+                tasksToInsert.add(followUpTask);
+            }
+        }
+    }
+
+    if (!tasksToInsert.isEmpty()) {
+        insert tasksToInsert;
+    }
+}
