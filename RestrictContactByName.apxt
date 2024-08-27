@@ -1,0 +1,7 @@
+trigger RestrictContactByName on Contact (before insert, before update) {
+    for (Contact con : Trigger.new) {
+        if (con.LastName == 'INVALIDNAME') {
+            con.addError('Contacts with the last name "INVALIDNAME" are not allowed.');
+        }
+    }
+}
