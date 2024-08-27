@@ -1,0 +1,73 @@
+@isTest
+public class TestRestrictContactByName {
+
+    @isTest
+    static void testInsertInvalidContact() {
+        // Create a contact with the last name 'INVALIDNAME'
+        Contact invalidContact = new Contact(LastName = 'INVALIDNAME', FirstName = 'John');
+        
+        Test.startTest();
+        try {
+            insert invalidContact;
+            // Fail the test if no exception is thrown
+            System.assert(false, 'Expected a DmlException due to invalid contact name.');
+        } catch (DmlException e) {
+            // Check if the error message contains the expected text
+            System.assert(e.getMessage().contains('Contacts with the last name "INVALIDNAME" are not allowed.'));
+        }
+        Test.stopTest();
+    }
+
+    @isTest
+    static void testUpdateInvalidContact() {
+        // Create and insert a valid contact
+        Contact validContact = new Contact(LastName = 'VALIDNAME', FirstName = 'John');
+        insert validContact;
+        
+        // Change the last name to 'INVALIDNAME'
+        validContact.LastName = 'INVALIDNAME';
+        
+        Test.startTest();
+        try {
+            update validContact;
+            // Fail the test if no exception is thrown
+            System.assert(false, 'Expected a DmlException due to invalid contact name.');
+        } catch (DmlException e) {
+            // Check if the error message contains the expected text
+            System.assert(e.getMessage().contains('Contacts with the last name "INVALIDNAME" are not allowed.'));
+        }
+        Test.stopTest();
+    }
+
+    @isTest
+    static void testInsertValidContact() {
+        // Create a valid contact
+        Contact validContact = new Contact(LastName = 'VALIDNAME', FirstName = 'John');
+        
+        Test.startTest();
+        insert validContact;
+        Test.stopTest();
+        
+        // Verify that the contact was inserted
+        Contact insertedContact = [SELECT Id, LastName FROM Contact WHERE Id = :validContact.Id];
+        System.assertEquals('VALIDNAME', insertedContact.LastName);
+    }
+
+    @isTest
+    static void testUpdateValidContact() {
+        // Create and insert a valid contact
+        Contact validContact = new Contact(LastName = 'VALIDNAME', FirstName = 'Jane');
+        insert validContact;
+        
+        // Change the last name to another valid name
+        validContact.LastName = 'ANOTHERVALIDNAME';
+        
+        Test.startTest();
+        update validContact;
+        Test.stopTest();
+        
+        // Verify that the contact was updated
+        Contact updatedContact = [SELECT Id, LastName FROM Contact WHERE Id = :validContact.Id];
+        System.assertEquals('ANOTHERVALIDNAME', updatedContact.LastName);
+    }
+}
