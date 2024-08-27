@@ -1,0 +1,44 @@
+@isTest
+public class TestVerifyDate {
+    @isTest
+    static void testCheckDatesWithin30Days() {
+        Date date1 = Date.newInstance(2023, 6, 1);
+        Date date2 = Date.newInstance(2023, 6, 15);
+        Date result = VerifyDate.CheckDates(date1, date2);
+        System.assertEquals(date2, result, 'Date2 should be within 30 days of Date1');
+    }
+
+    @isTest
+    static void testCheckDatesAfter30Days() {
+        Date date1 = Date.newInstance(2023, 6, 1);
+        Date date2 = Date.newInstance(2023, 7, 2);
+        Date expectedDate = Date.newInstance(2023, 6, 30);
+        Date result = VerifyDate.CheckDates(date1, date2);
+        System.assertEquals(expectedDate, result, 'Date2 should not be within 30 days of Date1');
+    }
+
+    @isTest
+    static void testCheckDatesDate2InPast() {
+        Date date1 = Date.newInstance(2023, 6, 15);
+        Date date2 = Date.newInstance(2023, 5, 31);
+        Date expectedDate = Date.newInstance(2023, 6, 30);
+        Date result = VerifyDate.CheckDates(date1, date2);
+        System.assertEquals(expectedDate, result, 'Date2 is in the past, so the result should be the end of the month');
+    }
+
+    @isTest
+    static void testCheckDatesOn30thDay() {
+        Date date1 = Date.newInstance(2023, 6, 1);
+        Date date2 = Date.newInstance(2023, 7, 1);
+        Date result = VerifyDate.CheckDates(date1, date2);
+        System.assertEquals(Date.newInstance(2023, 6, 30), result, 'Date2 is on the 30th day from Date1');
+    }
+
+    @isTest
+    static void testSetEndOfMonthDate() {
+        Date date1 = Date.newInstance(2023, 2, 15);
+        Date expectedDate = Date.newInstance(2023, 2, 28);
+        Date result = VerifyDate.CheckDates(date1, date1.addDays(31)); // Ensures SetEndOfMonthDate is called
+        System.assertEquals(expectedDate, result, 'The result should be the end of the month');
+    }
+}
